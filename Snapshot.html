@@ -1,0 +1,932 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Privacy Snapshot</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+		<style>
+			:root {
+				--bg: #f1f5f9;
+				--surface: #fff;
+				--surface-2: #f8fafc;
+				--border: #e4e2da;
+				--text-primary: #1c1b18;
+				--text-secondary: #6b6960;
+				--text-muted: #9b9a93;
+				--accent: #1c1b18;
+
+				--ok-bg: #e8f5e9;
+				--ok-fg: #2e7d32;
+				--warn-bg: #f1f5f9;
+				--warn-fg: #8c6800;
+				--bad-bg: #f1f5f9;
+				--bad-fg: #b71c1c;
+				--neutral-bg: #ebebeb;
+				--neutral-fg: #4a4a4a;
+
+				--radius-sm: 8px;
+				--radius-md: 14px;
+				--radius-lg: 20px;
+			}
+
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			body {
+				font-family: "DM Sans", sans-serif;
+				background: var(--bg);
+				color: var(--text-primary);
+				min-height: 100vh;
+				padding: 48px 20px 80px;
+			}
+
+			.page-wrap {
+				max-width: 960px;
+				margin: 0 auto;
+			}
+
+			/* ── Header ── */
+			header {
+				margin-bottom: 44px;
+			}
+			.eyebrow {
+				font-size: 0.72rem;
+				letter-spacing: 0.12em;
+				text-transform: uppercase;
+				color: var(--text-muted);
+				margin-bottom: 10px;
+			}
+			header h1 {
+				font-size: 2.4rem;
+				font-weight: 600;
+				letter-spacing: -0.03em;
+				line-height: 1.1;
+				color: var(--text-primary);
+			}
+			header p {
+				margin-top: 10px;
+				font-size: 1rem;
+				color: var(--text-secondary);
+			}
+
+			/* ── Controls ── */
+			.controls {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				flex-wrap: wrap;
+				margin-bottom: 32px;
+			}
+
+			.select-wrap {
+				position: relative;
+			}
+			.select-wrap select {
+				appearance: none;
+				background: var(--surface);
+				border: 1.5px solid var(--border);
+				border-radius: var(--radius-md);
+				padding: 10px 38px 10px 14px;
+				font-family: "DM Sans", sans-serif;
+				font-size: 0.92rem;
+				font-weight: 500;
+				color: var(--text-primary);
+				cursor: pointer;
+				min-width: 230px;
+				transition: border-color 0.15s;
+			}
+			.select-wrap select:focus {
+				outline: none;
+				border-color: var(--accent);
+			}
+			.select-wrap::after {
+				content: "";
+				position: absolute;
+				right: 14px;
+				top: 50%;
+				transform: translateY(-50%);
+				border: 5px solid transparent;
+				border-top-color: var(--text-muted);
+				pointer-events: none;
+			}
+
+			.compare-btn {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				background: var(--surface);
+				border: 1.5px solid var(--border);
+				border-radius: var(--radius-md);
+				padding: 10px 16px;
+				font-family: "DM Sans", sans-serif;
+				font-size: 0.92rem;
+				font-weight: 500;
+				color: var(--text-secondary);
+				cursor: pointer;
+				transition: all 0.15s;
+				user-select: none;
+			}
+			.compare-btn:hover {
+				border-color: var(--text-primary);
+				color: var(--text-primary);
+			}
+			.compare-btn.active {
+				background: var(--text-primary);
+				color: #fff;
+				border-color: var(--text-primary);
+			}
+			.compare-btn svg {
+				width: 15px;
+				height: 15px;
+				flex-shrink: 0;
+			}
+
+			.hidden {
+				display: none !important;
+			}
+
+			/* ── Grid ── */
+			.grid {
+				display: grid;
+				grid-template-columns: 1fr;
+				gap: 20px;
+				transition: grid-template-columns 0.2s;
+			}
+			.grid.compare {
+				grid-template-columns: 1fr 1fr;
+			}
+			@media (max-width: 700px) {
+				.grid.compare {
+					grid-template-columns: 1fr;
+				}
+			}
+
+			/* ── Card ── */
+			.card {
+				background: var(--surface);
+				border: 1.5px solid var(--border);
+				border-radius: var(--radius-lg);
+				padding: 28px;
+				transition: box-shadow 0.2s;
+			}
+			.card:hover {
+				box-shadow: 0 6px 28px rgba(0, 0, 0, 0.06);
+			}
+
+			.card-header {
+				display: flex;
+				align-items: flex-start;
+				justify-content: space-between;
+				gap: 12px;
+				margin-bottom: 24px;
+				padding-bottom: 20px;
+				border-bottom: 1.5px solid var(--border);
+			}
+
+			.model-meta {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+			}
+			.badge {
+				width: 44px;
+				height: 44px;
+				border-radius: 11px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-family: "DM Mono", monospace;
+				font-size: 0.82rem;
+				font-weight: 500;
+				color: #fff;
+				flex-shrink: 0;
+				letter-spacing: 0.03em;
+			}
+			.badge-gpt {
+				background: #10a37f;
+			}
+			.badge-claude {
+				background: #c9602a;
+			}
+			.badge-gemini {
+				background: #4285f4;
+			}
+			.badge-llama {
+				background: #4f46e5;
+			}
+			.badge-mistral {
+				background: #f97316;
+			}
+			.badge-copilot {
+				background: #0078d4;
+			}
+
+			.model-name {
+				font-size: 1.18rem;
+				font-weight: 600;
+				line-height: 1.2;
+			}
+			.model-provider {
+				font-size: 0.8rem;
+				color: var(--text-muted);
+				font-weight: 500;
+				margin-top: 2px;
+			}
+
+			.risk-tag {
+				flex-shrink: 0;
+				font-family: "DM Mono", monospace;
+				font-size: 0.68rem;
+				font-weight: 500;
+				text-transform: uppercase;
+				letter-spacing: 0.08em;
+				padding: 5px 11px;
+				border-radius: 20px;
+			}
+			.risk-low {
+				background: var(--ok-bg);
+				color: var(--ok-fg);
+			}
+			.risk-medium {
+				background: var(--warn-bg);
+				color: var(--warn-fg);
+			}
+			.risk-high {
+				background: var(--bad-bg);
+				color: var(--bad-fg);
+			}
+
+			/* ── Rows ── */
+			.rows {
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+			}
+
+			.row {
+				display: flex;
+				align-items: flex-start;
+				gap: 14px;
+				padding: 14px;
+				border-radius: var(--radius-sm);
+				background: var(--surface-2);
+			}
+
+			.row-icon {
+				width: 34px;
+				height: 34px;
+				border-radius: 8px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-shrink: 0;
+			}
+			.row-icon svg {
+				width: 16px;
+				height: 16px;
+				stroke: var(--text-muted);
+			}
+
+			.row-body {
+				flex: 1;
+				min-width: 0;
+			}
+
+			.row-label {
+				font-family: "DM Mono", monospace;
+				font-size: 0.68rem;
+				letter-spacing: 0.1em;
+				text-transform: uppercase;
+				color: var(--text-muted);
+				margin-bottom: 3px;
+			}
+
+			.row-value {
+				font-size: 0.92rem;
+				font-weight: 600;
+				color: var(--text-primary);
+				margin-bottom: 3px;
+			}
+
+			.row-detail {
+				font-size: 0.8rem;
+				color: var(--text-secondary);
+				line-height: 1.5;
+			}
+
+			.status-pill {
+				display: inline-flex;
+				align-items: center;
+				gap: 5px;
+				margin-top: 7px;
+				font-size: 0.72rem;
+				font-weight: 600;
+				padding: 3px 9px;
+				border-radius: 5px;
+			}
+			.status-pill::before {
+				content: "";
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+			.s-good {
+				background: var(--ok-bg);
+				color: var(--ok-fg);
+			}
+			.s-good::before {
+				background: var(--ok-fg);
+			}
+			.s-warn {
+				background: var(--warn-bg);
+				color: var(--warn-fg);
+			}
+			.s-warn::before {
+				background: var(--warn-fg);
+			}
+			.s-bad {
+				background: var(--bad-bg);
+				color: var(--bad-fg);
+			}
+			.s-bad::before {
+				background: var(--bad-fg);
+			}
+			.s-neutral {
+				background: var(--neutral-bg);
+				color: var(--neutral-fg);
+			}
+			.s-neutral::before {
+				background: var(--neutral-fg);
+			}
+
+			/* ── Collected tags ── */
+			.collected {
+				margin-top: 20px;
+				padding-top: 18px;
+				border-top: 1.5px solid var(--border);
+			}
+			.collected-label {
+				font-family: "DM Mono", monospace;
+				font-size: 0.68rem;
+				letter-spacing: 0.1em;
+				text-transform: uppercase;
+				color: var(--text-muted);
+				margin-bottom: 10px;
+			}
+			.tags {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 6px;
+			}
+			.tag {
+				font-size: 0.8rem;
+				padding: 4px 12px;
+				border-radius: 20px;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				color: var(--text-secondary);
+			}
+			.tag.sensitive {
+				background: var(--warn-bg);
+				border-color: #f0cc70;
+				color: var(--warn-fg);
+			}
+
+			/* ── Footer ── */
+			.page-footer {
+				margin-top: 48px;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				flex-wrap: wrap;
+				gap: 12px;
+			}
+			.page-footer p {
+				font-size: 0.8rem;
+				color: var(--text-muted);
+			}
+			.methodology-link {
+				font-size: 0.8rem;
+				font-weight: 500;
+				color: var(--text-secondary);
+				text-decoration: none;
+			}
+			.methodology-link:hover {
+				color: var(--text-primary);
+			}
+		</style>
+	</head>
+	<body>
+		<div class="page-wrap">
+			<header>
+				<p class="eyebrow">LLM Privacy Comparison · LAST UPDATED June 2026</p>
+				<h1>Privacy Snapshot</h1>
+				<p>
+					<i
+						><strong>Overview only.</strong> This tool provides a simplified summary for quick orientation. Privacy policies
+						change, details vary by region and product tier, and legal nuance cannot be captured in a snapshot.
+						<strong>Always refer to the official privacy statement</strong> of any service before making decisions that
+						affect your personal data.</i
+					>
+				</p>
+			</header>
+
+			<div class="controls">
+				<div class="select-wrap">
+					<select id="modelA" onchange="render()">
+						<option value="gpt4">ChatGPT (GPT-4o)</option>
+						<option value="claude">Claude (Anthropic)</option>
+						<option value="gemini">Gemini 1.5 Pro</option>
+						<option value="llama">Llama 3 (Local)</option>
+						<option value="mistral">Mistral Large</option>
+						<option value="copilot">Microsoft Copilot</option>
+					</select>
+				</div>
+
+				<div class="select-wrap hidden" id="selectorB">
+					<select id="modelB" onchange="render()">
+						<option value="claude">Claude (Anthropic)</option>
+						<option value="gpt4" selected>ChatGPT (GPT-4o)</option>
+						<option value="gemini">Gemini 1.5 Pro</option>
+						<option value="llama">Llama 3 (Local)</option>
+						<option value="mistral">Mistral Large</option>
+						<option value="copilot">Microsoft Copilot</option>
+					</select>
+				</div>
+
+				<button class="compare-btn" id="compareBtn" onclick="toggleCompare()">
+					<svg
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					>
+						<rect x="3" y="3" width="18" height="18" rx="2" />
+						<line x1="12" y1="3" x2="12" y2="21" />
+					</svg>
+					Compare
+				</button>
+			</div>
+
+			<div class="grid" id="grid">
+				<div class="card" id="cardA"></div>
+				<div class="card hidden" id="cardB"></div>
+			</div>
+
+			<div class="page-footer">
+				<p>
+					<strong>Important:</strong> Privacy Snapshot is an educational tool designed to help users quickly orient themselves. It
+					is not legal advice, not a substitute for reading official privacy policies, and may not reflect the most current terms
+					of service.
+				</p>
+				<p>
+					AI providers update their policies regularly. Product tiers (free, Pro, Enterprise) often have different privacy terms.
+					Regional regulations (GDPR, CCPA, etc.) may grant you additional rights not reflected here.
+				</p>
+				<p>
+					Before sharing sensitive information with any AI service, review that service's current privacy policy and terms of use
+					directly.
+				</p>
+				<p>Sourced from public privacy policies. Verify directly with providers before sharing sensitive data.</p>
+
+				<!-- <a class="methodology-link" href="#methodology">How scores are derived ↓</a> -->
+			</div>
+		</div>
+
+		<script>
+			// ─────────────────────────────────────────────────────────────
+			//  SCORING RUBRICS
+			//  Each dimension maps a normalized `level` key → { status, label }
+			//  Levels are ordered worst → best so risk score can sum them.
+			// ─────────────────────────────────────────────────────────────
+			const RUBRICS = {
+				retention: {
+					// how long data is kept
+					levels: {
+						indefinite: { status: "bad", label: "Kept indefinitely" },
+						years_3: { status: "bad", label: "Up to 3 years" },
+						years_2: { status: "warn", label: "Up to 2 years" },
+						auto_18mo: { status: "warn", label: "Auto-deletes after 18 months" },
+						service_life: { status: "warn", label: "Duration of account" },
+						none: { status: "good", label: "No cloud retention" },
+					},
+				},
+				training: {
+					levels: {
+						default_on: { status: "bad", label: "Trained on by default" },
+						consumer_on: { status: "bad", label: "Consumer tier: on by default" },
+						opt_out: { status: "warn", label: "Opt-out available" },
+						not_used: { status: "good", label: "Not used for training" },
+						none: { status: "good", label: "No data transmitted" },
+					},
+				},
+				human_review: {
+					levels: {
+						routine: { status: "bad", label: "Routine human review" },
+						possible: { status: "warn", label: "Human review possible" },
+						limited: { status: "neutral", label: "Limited (safety/abuse only)" },
+						none: { status: "good", label: "No human review" },
+					},
+				},
+				deletion: {
+					levels: {
+						admin_complex: { status: "bad", label: "Admin-controlled / complex" },
+						manual_only: { status: "warn", label: "Manual deletion only" },
+						manual_good: { status: "neutral", label: "Manual with GDPR rights" },
+						auto_and_manual: { status: "good", label: "Auto-delete + manual" },
+						full_local: { status: "good", label: "Full local control" },
+					},
+				},
+				jurisdiction: {
+					levels: {
+						us_complex: { status: "warn", label: "US + complex sub-processors" },
+						us: { status: "neutral", label: "United States" },
+						us_eu: { status: "neutral", label: "US / EU (varies by tier)" },
+						eu: { status: "good", label: "EU (GDPR by default)" },
+						local: { status: "good", label: "Your device / your laws" },
+					},
+				},
+				encryption: {
+					levels: {
+						standard: { status: "good", label: "TLS + AES-256 at rest" },
+						device: { status: "good", label: "Device-level (OS encryption)" },
+					},
+				},
+			};
+
+			//  RISK SCORE  (lower = better; used to derive card risk label)
+			const STATUS_SCORE = { bad: 3, warn: 2, neutral: 1, good: 0 };
+
+			function overallRisk(model) {
+				const dims = ["retention", "training", "human_review", "deletion", "jurisdiction", "encryption"];
+				let total = 0;
+				let max = 0;
+				dims.forEach((d) => {
+					const level = model[d].level;
+					const s = RUBRICS[d].levels[level].status;
+					total += STATUS_SCORE[s];
+					max += 3; // worst possible per dim
+				});
+				const pct = total / max;
+				if (pct >= 0.55) return { key: "high", label: "High Risk" };
+				if (pct >= 0.28) return { key: "medium", label: "Medium Risk" };
+				return { key: "low", label: "Low Risk" };
+			}
+
+			const DATA = {
+				gpt4: {
+					name: "ChatGPT",
+					provider: "OpenAI",
+					badge: "GPT",
+					badgeClass: "gpt",
+					retention: {
+						level: "indefinite",
+						value: "Retained indefinitely",
+						detail: "Conversations stored in your account history. Deleted only upon manual request. No automatic expiry for standard accounts.",
+					},
+					training: {
+						level: "default_on",
+						value: "Used for training by default",
+						detail: "Inputs may be used to improve models unless you explicitly opt out via Settings → Data Controls. Opt-out is not the default.",
+					},
+					human_review: {
+						level: "possible",
+						value: "Human review possible",
+						detail: "OpenAI employees and contractors may review conversations for safety, quality, and policy enforcement.",
+					},
+					deletion: {
+						level: "manual_only",
+						value: "Manual deletion only",
+						detail: "Delete conversations individually or clear all history in Settings. No automatic expiry is available for consumer accounts.",
+					},
+					jurisdiction: {
+						level: "us",
+						value: "United States",
+						detail: "Data processed in the US. Sub-processors include Microsoft Azure and Scale AI.",
+					},
+					encryption: {
+						level: "standard",
+						value: "TLS in transit · AES-256 at rest",
+						detail: "Industry-standard encryption. Data is decrypted during processing for model inference.",
+					},
+					collected: [
+						"Prompts & responses",
+						"Account info",
+						"IP address & location",
+						"Device & browser info",
+						"Usage patterns",
+						"Payment details (if Plus)",
+					],
+					sensitive: ["Prompts & responses", "IP address & location"],
+				},
+
+				claude: {
+					name: "Claude",
+					provider: "Anthropic",
+					badge: "Cl",
+					badgeClass: "claude",
+					retention: {
+						level: "indefinite",
+						value: "30 days (opted out) or 5 years (opted in)",
+						detail: "If you opted out of training by the October 2025 deadline: conversations are stored until you delete them, then purged from backend systems within 30 days. If you opted in (or missed the deadline): Anthropic retains de-identified chats for up to 5 years. History is saved indefinitely in your account until manually deleted.",
+					},
+					training: {
+						level: "opt_out",
+						value: "Trained on by default (opt-out available)",
+						detail: "Since October 2025, Anthropic trains on Free, Pro, and Max consumer chats by default. If you opt out: data retained ~30 days then deleted, not used for training. If you opt in (or miss the deadline): retained up to 5 years in de-identified form. Opt out via Settings → Privacy → 'Help improve Claude'. Does not apply to API, Claude for Work, or enterprise tiers.",
+					},
+					human_review: {
+						level: "limited",
+						value: "Limited human review",
+						detail: "Review occurs only for safety investigations, policy violations, or explicit user feedback — not as routine practice.",
+					},
+					deletion: {
+						level: "manual_only",
+						value: "Manual deletion only",
+						detail: "Conversations are deleted on request via the UI. Purged from backend within 30 days of deletion. No consumer auto-delete feature exists (API users have a 7-day default retention, but that does not apply to Claude.ai).",
+					},
+					jurisdiction: {
+						level: "us_eu",
+						value: "United States (EU for some enterprise)",
+						detail: "Primary processing in the US on AWS. Some enterprise workloads may use EU AWS regions.",
+					},
+					encryption: {
+						level: "standard",
+						value: "TLS in transit · AES-256 at rest",
+						detail: "Standard encryption across all tiers. Additional enterprise controls available via VPC.",
+					},
+					collected: ["Prompts & responses", "Account info", "IP address", "Usage metadata", "Feedback (optional)"],
+					sensitive: ["Prompts & responses"],
+				},
+
+				gemini: {
+					name: "Gemini",
+					provider: "Google",
+					badge: "G",
+					badgeClass: "gemini",
+					retention: {
+						level: "auto_18mo",
+						value: "Auto-deletes after 18 months (default)",
+						detail: "Gemini Apps Activity is set to auto-delete after 18 months by default. Users can adjust to 3 months, 36 months, or disable auto-deletion entirely via myactivity.google.com.",
+					},
+					training: {
+						level: "opt_out",
+						value: "Used for training (opt-out available)",
+						detail: "Google may use inputs to improve models. Opt-out is available — and may be automatic in some regions (e.g., EU via GDPR) — but is not the default globally.",
+					},
+					human_review: {
+						level: "routine",
+						value: "Human review occurs",
+						detail: "Google employees and vendors review conversations for quality assurance, safety, and policy compliance.",
+					},
+					deletion: {
+						level: "auto_and_manual",
+						value: "Auto-delete (default 18 mo) + manual",
+						detail: "Auto-deletion is on by default at 18 months. You can also delete manually at any time via myactivity.google.com. Deletion may take time to propagate across all systems.",
+					},
+					jurisdiction: {
+						level: "us_eu",
+						value: "United States / EU (varies)",
+						detail: "Data processed globally. EU data may remain in-region for Workspace customers. Consumer accounts are primarily US-centric.",
+					},
+					encryption: {
+						level: "standard",
+						value: "TLS in transit · AES-256 at rest",
+						detail: "Google-standard encryption. Data is decrypted during processing and potentially for ad-targeting context inference.",
+					},
+					collected: [
+						"Prompts & responses",
+						"Google account data",
+						"Location & IP",
+						"Device info",
+						"Usage across Google services",
+						"Search history (if linked)",
+					],
+					sensitive: ["Prompts & responses", "Google account data", "Search history (if linked)"],
+				},
+
+				llama: {
+					name: "Llama 3",
+					provider: "Meta (Local)",
+					badge: "L3",
+					badgeClass: "llama",
+					retention: {
+						level: "none",
+						value: "No cloud retention",
+						detail: "Runs entirely on your device via tools like LM Studio or Ollama. Conversations exist only in local memory or your chosen local database — nothing is sent to Meta.",
+					},
+					training: {
+						level: "none",
+						value: "No data transmitted",
+						detail: "No inputs are sent to Meta or any third party. The model is static on your hardware unless you explicitly share feedback.",
+					},
+					human_review: {
+						level: "none",
+						value: "No human review",
+						detail: "No third-party access to your conversations. You have sole custody of all data.",
+					},
+					deletion: {
+						level: "full_local",
+						value: "Full local control",
+						detail: "Delete conversation files, clear cache, or uninstall. No remote copies exist to delete.",
+					},
+					jurisdiction: {
+						level: "local",
+						value: "Your device / your jurisdiction",
+						detail: "Data never leaves your hardware. Subject only to your local laws and device security posture.",
+					},
+					encryption: {
+						level: "device",
+						value: "Device-level encryption",
+						detail: "Protected by your OS encryption (BitLocker, FileVault, LUKS). No network transmission to intercept.",
+					},
+					collected: ["Nothing (by default)"],
+					sensitive: [],
+				},
+
+				mistral: {
+					name: "Mistral Large",
+					provider: "Mistral AI",
+					badge: "M",
+					badgeClass: "mistral",
+					retention: {
+						level: "service_life",
+						value: "Retained while account is active",
+						detail: "Conversations stored for the lifetime of your account. Deleted on account closure or manual request. EU users have GDPR deletion rights.",
+					},
+					training: {
+						level: "opt_out",
+						value: "Free/Pro/Student: on by default (opt-out) · Team/Enterprise: off",
+						detail: "Per Mistral's official help center (April 2026): Free, Pro, and Student Le Chat users have their conversations used for training by default, with the right to opt out. Team and Enterprise users are opted out by default. Opt out via Admin Console → Le Chat → Privacy, or in mobile Settings → Data & Account Controls.",
+					},
+					human_review: {
+						level: "limited",
+						value: "No routine human review",
+						detail: "No human review for standard usage. Triggered only for abuse investigations or legal requirements.",
+					},
+					deletion: {
+						level: "manual_good",
+						value: "Manual deletion + GDPR rights",
+						detail: "Delete conversations manually or close your account to remove data. EU users can invoke GDPR right to erasure.",
+					},
+					jurisdiction: {
+						level: "eu",
+						value: "France / European Union",
+						detail: "Mistral is EU-headquartered. Data primarily processed in France. GDPR protections apply by default to all users.",
+					},
+					encryption: {
+						level: "standard",
+						value: "TLS in transit · AES-256 at rest",
+						detail: "Standard encryption. Dedicated instances available for enterprise customers.",
+					},
+					collected: ["Prompts & responses", "Account info", "IP address", "Usage metadata"],
+					sensitive: ["Prompts & responses"],
+				},
+
+				copilot: {
+					name: "Copilot",
+					provider: "Microsoft",
+					badge: "CP",
+					badgeClass: "copilot",
+					retention: {
+						level: "auto_18mo",
+						value: "18 months (consumer) / admin-set (enterprise)",
+						detail: "Consumer Copilot stores conversation history for 18 months by default, per Microsoft's official support FAQ. Users can manually delete conversations at any time. Enterprise (M365 Copilot) follows admin-configured Purview retention policies.",
+					},
+					training: {
+						level: "opt_out",
+						value: "Consumer: on by default (opt-out available) · M365: off",
+						detail: "Consumer Copilot (personal Microsoft account) trains on your data by default. Opt out via Copilot settings → 'Train our generative AI models'. Microsoft 365 Copilot (work/enterprise with Entra ID) does NOT use data for training and doesn't retain it beyond the session.",
+					},
+					human_review: {
+						level: "possible",
+						value: "Human review possible",
+						detail: "Microsoft employees and partners may review conversations for safety, quality, and legal compliance.",
+					},
+					deletion: {
+						level: "auto_and_manual",
+						value: "Auto-delete after 18 months + manual",
+						detail: "Consumer accounts auto-delete after 18 months. Users can also manually delete individual conversations or full history at any time. Enterprise retention is admin-controlled via Microsoft Purview.",
+					},
+					jurisdiction: {
+						level: "us_complex",
+						value: "US (consumer) / EU optional (enterprise)",
+						detail: "Consumer data primarily processed in the US. Enterprise may specify EU data centres. Complex sub-processor network spans multiple jurisdictions.",
+					},
+					encryption: {
+						level: "standard",
+						value: "TLS in transit · AES-256 at rest",
+						detail: "Microsoft-standard encryption. Purview and compliance tools available for enterprise data governance.",
+					},
+					collected: [
+						"Prompts & responses",
+						"Microsoft account data",
+						"Enterprise identity (if M365)",
+						"Document context (if enabled)",
+						"Usage across Microsoft services",
+						"Telemetry & diagnostics",
+						"Ad targeting signals (consumer)",
+					],
+					sensitive: ["Prompts & responses", "Document context (if enabled)", "Usage across Microsoft services"],
+				},
+			};
+			const ICONS = {
+				retention: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+				training: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>`,
+				human_review: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
+				deletion: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`,
+				jurisdiction: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
+				encryption: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
+			};
+
+			const DIM_LABELS = {
+				retention: "Data Retention",
+				training: "Training Use",
+				human_review: "Human Review",
+				deletion: "Your Control",
+				jurisdiction: "Jurisdiction",
+				encryption: "Encryption",
+			};
+
+			function buildCard(modelKey) {
+				const m = DATA[modelKey];
+				const risk = overallRisk(m);
+				const dims = ["retention", "training", "human_review", "deletion", "jurisdiction", "encryption"];
+
+				const rows = dims
+					.map((dim) => {
+						const d = m[dim];
+						const rubric = RUBRICS[dim].levels[d.level];
+						const statusClass = `s-${rubric.status}`;
+						return `
+      <div class="row">
+        <div class="row-icon">${ICONS[dim]}</div>
+        <div class="row-body">
+          <div class="row-label">${DIM_LABELS[dim]}</div>
+          <div class="row-value">${d.value}</div>
+          <div class="row-detail">${d.detail}</div>
+          <span class="status-pill ${statusClass}">${rubric.label}</span>
+        </div>
+      </div>`;
+					})
+					.join("");
+
+				const tags = m.collected
+					.map((item) => {
+						const isSensitive = m.sensitive.includes(item);
+						return `<span class="tag${isSensitive ? " sensitive" : ""}">${item}</span>`;
+					})
+					.join("");
+
+				return `
+    <div class="card-header">
+      <div class="model-meta">
+        <div class="badge badge-${m.badgeClass}">${m.badge}</div>
+        <div>
+          <div class="model-name">${m.name}</div>
+          <div class="model-provider">${m.provider}</div>
+        </div>
+      </div>
+      <div class="risk-tag risk-${risk.key}">${risk.label}</div>
+    </div>
+    <div class="rows">${rows}</div>
+    <div class="collected">
+      <div class="collected-label">What they collect</div>
+      <div class="tags">${tags}</div>
+    </div>`;
+			}
+
+			let comparing = false;
+
+			function render() {
+				document.getElementById("cardA").innerHTML = buildCard(document.getElementById("modelA").value);
+				if (comparing) {
+					document.getElementById("cardB").innerHTML = buildCard(document.getElementById("modelB").value);
+				}
+			}
+
+			function toggleCompare() {
+				comparing = !comparing;
+				document.getElementById("compareBtn").classList.toggle("active", comparing);
+				document.getElementById("selectorB").classList.toggle("hidden", !comparing);
+				document.getElementById("cardB").classList.toggle("hidden", !comparing);
+				document.getElementById("grid").classList.toggle("compare", comparing);
+				if (comparing) {
+					document.getElementById("cardB").innerHTML = buildCard(document.getElementById("modelB").value);
+				}
+			}
+
+			render();
+		</script>
+	</body>
+</html>
